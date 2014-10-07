@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="jdbc-pool/dist/poesys-jdbc-pool-1.0.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/jdbc-pool/jdbc-pool.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <jar path="poesys-jdbc-pool/dist/poesys-jdbc-pool-1.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/poesys-jdbc-pool/jdbc-pool.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>
     <manifest generateManifest="true" manifestLocation="" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
@@ -11,6 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=jdbc-pool/src"/>
+        <javaElement handleIdentifier="=poesys-jdbc-pool/src"/>
     </selectedElements>
 </jardesc>

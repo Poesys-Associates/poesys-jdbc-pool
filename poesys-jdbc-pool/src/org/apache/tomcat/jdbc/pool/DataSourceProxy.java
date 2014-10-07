@@ -46,30 +46,54 @@ import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorDefinition;
  */
 
 public class DataSourceProxy implements PoolConfiguration {
+  /** logger for this class */
   private static final Logger log = Logger.getLogger(DataSourceProxy.class);
 
+  /** connection pool for the connections from this data source */
   protected volatile ConnectionPool pool = null;
 
+  /** configuration for the connection pool for this data source */
   protected volatile PoolConfiguration poolProperties = null;
 
+  /**
+   * Create a DataSourceProxy object.
+   */
   public DataSourceProxy() {
     this(new PoolProperties());
   }
 
+  /**
+   * Create a DataSourceProxy object with a connection pool configuration.
+   * 
+   * @param poolProperties the pool configuration
+   */
   public DataSourceProxy(PoolConfiguration poolProperties) {
     if (poolProperties == null)
       throw new NullPointerException("PoolConfiguration can not be null.");
     this.poolProperties = poolProperties;
   }
 
-  @SuppressWarnings("unused")
   // Has to match signature in DataSource
+  /**
+   * Is this object a wrapper for a specified class?
+   * 
+   * @param iface the class
+   * @return false
+   * @throws SQLException never
+   */
   public boolean isWrapperFor(Class<?> iface) throws SQLException {
     // we are not a wrapper of anything
     return false;
   }
 
-  @SuppressWarnings("unused")
+  /**
+   * Unwrap the object.
+   * 
+   * @param iface the class
+   * @return nothing
+   * @throws SQLException never
+   */
+
   // Has to match signature in DataSource
   public <T> T unwrap(Class<T> iface) throws SQLException {
     // we can't unwrap anything
@@ -77,7 +101,14 @@ public class DataSourceProxy implements PoolConfiguration {
   }
 
   /**
+   * Get a connection. 
+   * 
    * {@link javax.sql.DataSource#getConnection()}
+   * 
+   * @param username the username with which to log in
+   * @param password the user's password
+   * @return the connection
+   * @throws SQLException
    */
   public Connection getConnection(String username, String password)
       throws SQLException {
@@ -90,15 +121,20 @@ public class DataSourceProxy implements PoolConfiguration {
     }
   }
 
+  /**
+   * Get the connection pool configuration.
+   * 
+   * @return the configuration
+   */
   public PoolConfiguration getPoolProperties() {
     return poolProperties;
   }
 
   /**
-   * Sets up the connection pool, by creating a pooling driver.
+   * Sets up the connection pool by creating a pooling driver.
    * 
-   * @return Driver
-   * @throws SQLException
+   * @return the driver
+   * @throws SQLException when there is a problem creating the pool
    */
   public ConnectionPool createPool() throws SQLException {
     if (pool != null) {
@@ -109,10 +145,10 @@ public class DataSourceProxy implements PoolConfiguration {
   }
 
   /**
-   * Sets up the connection pool, by creating a pooling driver.
+   * Sets up the connection pool by creating a pooling driver.
    * 
-   * @return Driver
-   * @throws SQLException
+   * @return the driver
+   * @throws SQLException when there is a problem creating the pool
    */
   private synchronized ConnectionPool pCreatePool() throws SQLException {
     if (pool != null) {
@@ -125,6 +161,9 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link javax.sql.DataSource#getConnection()}
+   * 
+   * @return
+   * @throws SQLException
    */
 
   public Connection getConnection() throws SQLException {
@@ -148,6 +187,9 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link javax.sql.XADataSource#getXAConnection()}
+   * 
+   * @return
+   * @throws SQLException
    */
   public XAConnection getXAConnection() throws SQLException {
     Connection con = getConnection();
@@ -165,6 +207,11 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link javax.sql.XADataSource#getXAConnection(String, String)}
+   * 
+   * @param username
+   * @param password
+   * @return
+   * @throws SQLException
    */
   public XAConnection getXAConnection(String username, String password)
       throws SQLException {
@@ -183,6 +230,9 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link javax.sql.DataSource#getConnection()}
+   * 
+   * @return
+   * @throws SQLException
    */
   public javax.sql.PooledConnection getPooledConnection() throws SQLException {
     return (javax.sql.PooledConnection)getConnection();
@@ -193,6 +243,8 @@ public class DataSourceProxy implements PoolConfiguration {
    * 
    * @param username unused
    * @param password unused
+   * @return
+   * @throws SQLException
    */
   public javax.sql.PooledConnection getPooledConnection(String username,
                                                         String password)
@@ -200,14 +252,23 @@ public class DataSourceProxy implements PoolConfiguration {
     return (javax.sql.PooledConnection)getConnection();
   }
 
+  /**
+   * @return
+   */
   public ConnectionPool getPool() {
     return pool;
   }
 
+  /**
+   * 
+   */
   public void close() {
     close(false);
   }
 
+  /**
+   * @param all
+   */
   public void close(boolean all) {
     try {
       if (pool != null) {
@@ -222,6 +283,9 @@ public class DataSourceProxy implements PoolConfiguration {
     }
   }
 
+  /**
+   * @return
+   */
   public int getPoolSize() {
     final ConnectionPool p = pool;
     if (p == null)
@@ -248,22 +312,17 @@ public class DataSourceProxy implements PoolConfiguration {
     return pool.getName();
   }
 
+  /**
+   * @param poolProperties
+   */
   public void setPoolProperties(PoolConfiguration poolProperties) {
     this.poolProperties = poolProperties;
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setDriverClassName(String driverClassName) {
     this.poolProperties.setDriverClassName(driverClassName);
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setInitialSize(int initialSize) {
@@ -279,72 +338,40 @@ public class DataSourceProxy implements PoolConfiguration {
     this.poolProperties.setInitSQL(initSQL);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-
   @Override
   public void setLogAbandoned(boolean logAbandoned) {
     this.poolProperties.setLogAbandoned(logAbandoned);
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setMaxActive(int maxActive) {
     this.poolProperties.setMaxActive(maxActive);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-
   @Override
   public void setMaxIdle(int maxIdle) {
     this.poolProperties.setMaxIdle(maxIdle);
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setMaxWait(int maxWait) {
     this.poolProperties.setMaxWait(maxWait);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-
   @Override
   public void setMinEvictableIdleTimeMillis(int minEvictableIdleTimeMillis) {
     this.poolProperties.setMinEvictableIdleTimeMillis(minEvictableIdleTimeMillis);
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setMinIdle(int minIdle) {
     this.poolProperties.setMinIdle(minIdle);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-
   @Override
   public void setNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
     this.poolProperties.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
   }
-
-  /**
-   * {@inheritDoc}
-   */
 
   @Override
   public void setPassword(String password) {
@@ -558,15 +585,22 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * no-op {@link javax.sql.DataSource#getParentLogger}
+   * 
+   * @return
+   * @throws SQLFeatureNotSupportedException
    */
-  public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+  public java.util.logging.Logger getParentLogger()
+      throws SQLFeatureNotSupportedException {
     throw new SQLFeatureNotSupportedException();
   }
 
   /**
    * no-op {@link javax.sql.DataSource#getLogWriter}
+   * 
+   * @return
+   * @throws SQLException
    */
-  @SuppressWarnings("unused")
+
   // Has to match signature in DataSource
   public PrintWriter getLogWriter() throws SQLException {
     return null;
@@ -574,15 +608,24 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * no-op {@link javax.sql.DataSource#setLogWriter(PrintWriter)}
+   * 
+   * @param out
+   * @throws SQLException
    */
-  @SuppressWarnings("unused")
+
   // Has to match signature in DataSource
+  /**
+   * @param out
+   * @throws SQLException
+   */
   public void setLogWriter(PrintWriter out) throws SQLException {
     // NOOP
   }
 
   /**
    * no-op {@link javax.sql.DataSource#getLoginTimeout}
+   * 
+   * @return
    */
   public int getLoginTimeout() {
     if (poolProperties == null) {
@@ -594,6 +637,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link javax.sql.DataSource#setLoginTimeout(int)}
+   * 
+   * @param i
    */
   public void setLoginTimeout(int i) {
     if (poolProperties == null) {
@@ -640,6 +685,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
   /**
    * {@link #getIdle()}
+   * 
+   * @return
    */
   public int getNumIdle() {
     return getIdle();
@@ -1300,6 +1347,9 @@ public class DataSourceProxy implements PoolConfiguration {
     getPoolProperties().setPropagateInterruptState(propagateInterruptState);
   }
 
+  /**
+   * 
+   */
   public void purge() {
     try {
       createPool().purge();
@@ -1308,6 +1358,9 @@ public class DataSourceProxy implements PoolConfiguration {
     }
   }
 
+  /**
+   * 
+   */
   public void purgeOnReturn() {
     try {
       createPool().purgeOnReturn();
