@@ -21,6 +21,9 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 
 import javax.sql.XAConnection;
+
+import org.apache.log4j.Logger;
+
 /**
  * A ProxyConnection object is the bottom most interceptor that wraps an object of type
  * {@link PooledConnection}. The ProxyConnection intercepts three methods:
@@ -34,12 +37,14 @@ import javax.sql.XAConnection;
  * @author Filip Hanik
  */
 public class ProxyConnection extends JdbcInterceptor {
+  private static final Logger logger = Logger.getLogger(ProxyConnection.class);
 
     protected PooledConnection connection = null;
 
     protected ConnectionPool pool = null;
 
     public PooledConnection getConnection() {
+      logger.debug("Getting connection " + connection + " from JDBC pool proxy connection");
         return connection;
     }
 
@@ -96,6 +101,9 @@ public class ProxyConnection extends JdbcInterceptor {
         }
         if (compare(CLOSE_VAL,method)) {
             if (connection==null) return null; //noop for already closed.
+            // Debug, showing connection closes with stack trace
+            RuntimeException e = new RuntimeException("Closing pooled connection");
+            logger.debug("Closing connection " + connection + ", releasing to JDBC pool", e);
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
@@ -103,6 +111,7 @@ public class ProxyConnection extends JdbcInterceptor {
         } else if (compare(TOSTRING_VAL,method)) {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
+          logger.debug("Getting connection " + connection + " from JDBC pool proxy connection invoke");
             return connection.getConnection();
         } else if (method.getDeclaringClass().equals(XAConnection.class)) {
             try {
