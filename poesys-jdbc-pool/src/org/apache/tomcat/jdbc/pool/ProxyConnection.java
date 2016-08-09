@@ -103,7 +103,7 @@ public class ProxyConnection extends JdbcInterceptor {
             if (connection==null) return null; //noop for already closed.
             // Debug, showing connection closes with stack trace
             RuntimeException e = new RuntimeException("Closing pooled connection");
-            logger.debug("Closing connection " + connection + ", releasing to JDBC pool", e);
+            logger.debug("Closing connection " + connection + ", releasing to JDBC pool; stack trace shows call stack", e);
             PooledConnection poolc = this.connection;
             this.connection = null;
             pool.returnConnection(poolc);
